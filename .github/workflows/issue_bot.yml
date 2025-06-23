@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  close_issues:
+  process_issue:
     runs-on: ubuntu-latest
 
     steps:
@@ -114,7 +114,7 @@ jobs:
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     issue_number: issueNumber,
-                    body: `🔍 Found potentially related issues: ${issueLinks}\n\nPlease check if any of these issues are related to your problem before proceeding.`
+                    body: `🔍 Found related issues: ${issueLinks}\n\nPlease check if any of these issues are related to your problem before proceeding.`
                   });
                 }
             
