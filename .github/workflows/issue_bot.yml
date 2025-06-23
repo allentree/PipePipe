@@ -66,6 +66,7 @@ jobs:
                 }
             
                 const titleResult = await titleResponse.json();
+                console.log(titleResult)
                 const generatedTitle = titleResult.generated_result;
             
                 // Update title if different
@@ -96,6 +97,7 @@ jobs:
                 }
             
                 const analyzeResult = await analyzeResponse.json();
+                console.log(analyzeResult)
                 const relatedIssues = analyzeResult.related_issues;
             
                 // Handle related issues response
