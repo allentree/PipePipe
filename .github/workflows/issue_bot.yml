@@ -56,8 +56,7 @@ jobs:
                   },
                   body: JSON.stringify({
                     issue_number: issueNumber,
-                    owner: "InfinityLoop1308",
-                    repo: "PipePipe"
+                    repo: "InfinityLoop1308/PipePipe"
                   })
                 });
             
@@ -67,6 +66,26 @@ jobs:
             
                 const titleResult = await titleResponse.json();
                 console.log(titleResult)
+            
+                // Check for spam and close if detected
+                if (titleResult.is_spam) {
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issueNumber,
+                    body: "Closing as suspected spam. If you believe this is a mistake, please revise your content and open a new issue."
+                  });
+            
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issueNumber,
+                    state: "closed",
+                    state_reason: "spam"
+                  });
+                  return; // Stop processing here
+                }
+            
                 const generatedTitle = titleResult.generated_result;
             
                 // Update title if different
@@ -86,9 +105,8 @@ jobs:
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
-                    title: generatedTitle,
-                    owner: "InfinityLoop1308",
-                    repo: "PipePipe"
+                    issue_link: `https://github.com/InfinityLoop1308/PipePipe/issues/${issueNumber}`,
+                    type: "all"
                   })
                 });
             
@@ -109,12 +127,12 @@ jobs:
                     body: "✅ No similar issues found. This appears to be a unique issue."
                   });
                 } else {
-                  const issueLinks = relatedIssues.map(num => `#${num}`).join(', ');
+                  const issueList = relatedIssues.map(num => `- #${num}`).join('\n');
                   await github.rest.issues.createComment({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     issue_number: issueNumber,
-                    body: `🔍 Found related issues: ${issueLinks}\n\nPlease check these issues first before proceeding.`
+                    body: `🔍 Found related issues:\n${issueList}\n\nPlease check these issues first before proceeding.`
                   });
                 }
             
